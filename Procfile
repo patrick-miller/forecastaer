@@ -1,1 +1,1 @@
-web: gunicorn forecastaer:app --log-file=-
+web: gunicorn forecastaer:app
