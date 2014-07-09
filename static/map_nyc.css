@@ -1,0 +1,83 @@
+body {
+    padding: 1vw;
+    background-color:
+}
+
+#container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#d3map {
+    margin: 0;
+    height: 100%;
+    width: 75%;
+}
+
+#loc_container {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+#curr_loc {
+    color: black;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+    font-size: 2.5vw;
+}
+
+.curr_loc_label {
+    text-align: left;
+}
+
+.curr_loc_output {
+    text-align: right;
+}
+
+
+#my_loc, #my_loc table {
+    color: black;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+    font-size: 2.5vw;
+}
+
+.my_loc_label {
+    text-align: left;
+}
+
+.my_loc_output {
+    text-align: right;
+}
+
+#grid path {
+    vector-effect: non-scaling-stroke;
+}
+
+#grid path:hover {
+    stroke-width: 2px;
+    vector-effect: non-scaling-stroke;
+
+    stroke: #1c1c1c;
+}
+
+.SvgOverlay {
+    position: relative;
+}
+
+.SvgOverlay svg {
+    position: absolute;
+    top: -4000px;
+    left: -4000px;
+    width: 8000px;
+    height: 8000px;
+}
