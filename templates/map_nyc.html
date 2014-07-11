@@ -6,6 +6,7 @@
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript" src="http://d3js.org/queue.v1.min.js"></script>
     <script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
+    <script type="text/javascript" src="https://fgnass.github.io/spin.js/spin.js"></script>
 
     <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='map_nyc.css') }}">
 
@@ -13,6 +14,8 @@
 <body>
 
 <div id="container">
+
+    <div id="loading"></div>
 
     <div id="d3map"></div>
     <div id="loc_container">

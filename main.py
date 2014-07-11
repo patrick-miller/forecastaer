@@ -13,7 +13,7 @@ from StringIO import StringIO
 import csv
 
 
-DataDir = "/media/pwmiller/store/Projects/Python/ForecastAer/data"
+DataDir = "static"
 
 
 #TODO: sanity checks, Port Richmond < 0
@@ -182,7 +182,7 @@ def get_station_raw_data(stations, start_date, end_date):
     return all_data, aq_stations
 
 
-def get_stations_aqi_data(station_data, breakpoints, aq_variables):
+def calculate_stations_aqi_data(station_data, breakpoints, aq_variables):
     """
     24 hours for PM2.5, 1 hours for O3
     """
@@ -337,10 +337,11 @@ def main():
     station_data, aq_stations = get_station_raw_data(all_stations, start_date,
                                                      end_date)
 
-    stations_ffilled = station_data.groupby('station').ffill()
+    stations_ffilled = station_data.groupby('station').fillna(method='ffill')
+    stations_ffilled['station'] = station_data['station']
 
     # Current station data
-    stations_output = get_stations_aqi_data(stations_ffilled, breakpoints, aq_variables)
+    stations_output = calculate_stations_aqi_data(stations_ffilled, breakpoints, aq_variables)
 
     # Interpolate the grid data
     current_grid_data = get_interpolated_grid_data(stations_output, aq_variables)

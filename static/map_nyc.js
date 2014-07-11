@@ -35,19 +35,33 @@ var mapOptions = {
 
 var current_loc_data = d3.map();
 
+//Spinner
+var spinner = new Spinner();
+var spin_target = document.getElementById('loading');
+spinner.spin(spin_target);
+
+
+
+
+
 
 // Queue up the data files
 queue()
     .defer(d3.json, "/static/nyc_border.geojson")
     .defer(d3.json, "/static/grid.geojson")
     .defer(d3.csv, "/static/breakpoints.csv")
-    .defer(d3.csv, "/static/current_loc_data.csv", function(d) { current_loc_data.set(Math.round(d.gr_id), d); })
+    .defer(d3.csv, "/static/current_loc_data.csv", function(d) {
+        current_loc_data.set(Math.round(d.gr_id), d); })
     .await(ready);
 
+
+var ddd;
 
 function ready(error, nyc_border_data, grid_data, breakpoints){
 
     if (error) return console.error(error);
+
+    document.getElementById('loading').style.display = 'block';
 
     function getColor(d, metric){
 
@@ -85,18 +99,19 @@ function ready(error, nyc_border_data, grid_data, breakpoints){
             }
 
         }
-
+        ddd = domain;
         var alpha = d3.scale.linear().domain(domain).range([0.3, 0.9]);
 
         return alpha(d);
     }
 
 
-
     var nyc_border = nyc_border_data.features;
 
     // Load the google map
     function initialize() {
+
+        document.getElementById('loading').style.display = 'block';
 
         map = new google.maps.Map(document.getElementById('d3map'),
             mapOptions);
@@ -190,9 +205,13 @@ function ready(error, nyc_border_data, grid_data, breakpoints){
         // Add the overlay to the map
         overlay.setMap(map);
 
+        setTimeout(function(){document.getElementById('loading').style.display = 'none';},
+            2000);
+
     }
     initialize();
     google.maps.event.addDomListener(window, 'resize', initialize);
+
 }
 
 var highlighted_loc;

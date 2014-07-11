@@ -5,23 +5,7 @@ import numpy as np
 from scipy import interpolate
 from matplotlib import mlab
 
-BaseDir = "/media/pwmiller/store/Projects/Python/ForecastAer"
-
-
-def add_properties_to_geojson():
-    with open('census_tracts_2010.geojson', 'r') as f:
-        geo_data = json.load(f)
-
-    geo = geo_data['objects']['nyct2010']['geometries']
-    for iii in range(0, len(geo)):
-        geo_data['objects']['nyct2010']['geometries'][iii]['id'] = "id_" + str(iii)
-        #props = {'lat': 1}  #props = {"lon": dat[iii, 'lon'],
-        # "lat": dat[iii, 'lat'], "area": dat[iii, 'area']}
-        #geo_data['objects']['nyct2010']['geometries'][iii]['properties'] = props
-
-    with open('census_tracts.geojson', 'w') as f:
-        json.dump(geo_data, f)
-
+BaseDir = "/data"
 
 
 def output_grid_information():
@@ -91,3 +75,37 @@ def output_grid_information():
         json.dump(all_json, f)
 
     grid_df.to_csv(BaseDir + '/grid_locs.csv', index=False)
+
+
+def output_border():
+    input_file = BaseDir + '/boroughs.geojson'
+    output_file = BaseDir + '/old_nyc_border.geojson'
+
+    with open(input_file) as f:
+        dat = json.load(f)
+
+    features = dat['features']
+
+    multipolys = [feat['geometry']['coordinates'] for feat in features]
+
+    output = []
+
+    for multi in multipolys:
+        for poly in multi:
+            output.append(poly[0])
+
+    output_json = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"id": "border"},
+                "geometry": {"type": "MultiPolygon",
+                             "coordinates": [output]}
+            }
+        ]
+    }
+
+    with open(output_file, 'w') as f:
+        json.dump(output_json, f)
+
