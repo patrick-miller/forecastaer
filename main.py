@@ -13,7 +13,7 @@ from StringIO import StringIO
 import csv
 
 
-DataDir = 'app/static'
+DataDir = '/app/static'
 
 
 #TODO: sanity checks, Port Richmond < 0
