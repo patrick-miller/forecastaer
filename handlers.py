@@ -8,6 +8,8 @@ from flask import Flask
 from flask import render_template
 from flask import url_for
 
+import pandas as pd
+
 
 app = Flask(__name__)
 
