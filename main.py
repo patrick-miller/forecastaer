@@ -14,6 +14,7 @@ import csv
 
 
 DataDir = '/app/static'
+DataDir = 'static'
 
 
 #TODO: sanity checks, Port Richmond < 0
@@ -356,7 +357,11 @@ def main():
     # Interpolate the grid data
     current_grid_data = get_interpolated_grid_data(stations_output, aq_variables)
 
+    #TODO: need to output data in a different way
+    # Ephemeral files
+
     current_grid_data.to_csv(DataDir + '/current_loc_data.csv', index=False)
+    current_grid_data.to_csv(DataDir + '/new_dat.csv', index=False)
 
     print 'Finished main'
 

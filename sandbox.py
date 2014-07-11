@@ -79,7 +79,7 @@ def output_grid_information():
 
 def output_border():
     input_file = BaseDir + '/boroughs.geojson'
-    output_file = BaseDir + '/old_nyc_border.geojson'
+    output_file = BaseDir + '/nyc_border_smaller.geojson'
 
     with open(input_file) as f:
         dat = json.load(f)
