@@ -13,7 +13,7 @@ from StringIO import StringIO
 import csv
 
 
-DataDir = "static"
+DataDir = 'app/static'
 
 
 #TODO: sanity checks, Port Richmond < 0
@@ -325,6 +325,8 @@ def get_breakpoints():
 
 
 def main():
+    print 'Begin main'
+
     aq_variables = ['PM25', 'O3', 'AQI']
 
     all_stations = get_stations()
@@ -334,20 +336,29 @@ def main():
     end_date = dt.date.today()
     start_date = end_date - dt.timedelta(1)
 
+    print 'Get station data'
+
     station_data, aq_stations = get_station_raw_data(all_stations, start_date,
                                                      end_date)
+
+    print 'Finished getting station data'
 
     stations_ffilled = station_data.groupby('station').fillna(method='ffill')
     stations_ffilled['station'] = station_data['station']
 
+    print 'Calculating AQI'
+
     # Current station data
     stations_output = calculate_stations_aqi_data(stations_ffilled, breakpoints, aq_variables)
+
+    print 'Interpolating over grid'
 
     # Interpolate the grid data
     current_grid_data = get_interpolated_grid_data(stations_output, aq_variables)
 
     current_grid_data.to_csv(DataDir + '/current_loc_data.csv', index=False)
 
+    print 'Finished main'
 
 
 
