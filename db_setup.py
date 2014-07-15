@@ -28,3 +28,10 @@
 #
 # CurrentGridData.query.delete()
 
+
+
+# SET UP:
+#
+# change app.config in app.py
+# change static file dir in main.py
+#

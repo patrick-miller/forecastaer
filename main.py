@@ -16,7 +16,7 @@ from timeout import timeout
 
 
 DataDir = '/app/static'
-DataDir = 'static'   # TODO: remove this
+#DataDir = 'static'   # TODO: remove this
 
 
 #TODO: sanity checks, Port Richmond < 0
