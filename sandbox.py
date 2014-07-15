@@ -38,21 +38,21 @@ def output_grid_information():
 
     for lat in lats:
         for lon in lons:
-            s_lon = lon
-            n_lon = lon + step
-            w_lat = lat
-            e_lat = lat + step
+            w_lon = lon
+            e_lon = lon + step
+            s_lat = lat
+            n_lat = lat + step
 
             c_lon = lon + step / 2
             c_lat = lat + step / 2
 
             grid_df = grid_df.append(pd.DataFrame({"gr_id": [gr_id],
                                                    "c_lon": [c_lon], "c_lat": [c_lat],
-                                                   "s_lon": [s_lon], "w_lat": [w_lat],
-                                                   "n_lon": [n_lon], "e_lat": [e_lat]}))
+                                                   "w_lon": [w_lon], "s_lat": [s_lat],
+                                                   "e_lon": [e_lon], "n_lat": [n_lat]}))
 
-            coor = [[[s_lon, w_lat], [n_lon, w_lat], [n_lon, e_lat],
-                     [s_lon, e_lat], [s_lon, w_lat]]]
+            coor = [[[s_lat, w_lon], [n_lat, w_lon], [n_lat, e_lon],
+                     [s_lat, e_lon], [s_lat, w_lon]]]
 
             feature = {
                 "type": "Feature",

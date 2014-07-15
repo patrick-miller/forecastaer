@@ -1,1 +1,1 @@
-web: gunicorn handlers:app
+web: gunicorn app:app

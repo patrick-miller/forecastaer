@@ -1,5 +1,5 @@
 AQI Category,Index,PM25_24hr,O3_8hr,O3_1hr,Color
-NA,0,0,0,125,#009966
+NA,0,0,0,0,#009966
 Good,50,12,60,125,#009966
 Moderate,100,35.4,75,125,#ffde33
 Unhealthy for Sensitive Groups,150,55.4,95,165,#ff9933
