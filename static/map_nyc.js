@@ -315,9 +315,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
         }
 
         if(grid_id > -1){
-            document.getElementById('my_loc_lat').textContent = lat;
-            document.getElementById('my_loc_lon').textContent = lon;
-
             var loc_data = getLocData(grid_id);
             visualizeLocData(loc_data);
 

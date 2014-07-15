@@ -12,10 +12,22 @@ manager = Manager(app)
 
 
 @manager.command
-def update_grid():
+def update_grid(manual=False):
+    """
+    Update the grid on a certain interval
+    """
+    hours_of_day = [6, 9, 12, 15, 18, 21] # hours to use
+
+    if not manual or dt.datetime.now().hour in hours_of_day:
+        return -1
+
+    # Update the data
     current_data = main()
 
-    #Write data to database
+    # Write data to database and delete old data
+    print 'Deleting data from table CurrentGridData'
+    CurrentGridData.query.delete()
+
     print 'Writing data to table CurrentGridData'
     for row in current_data.iterrows():
         row = row[1]
@@ -23,6 +35,8 @@ def update_grid():
                                   row['AQI'], row['time'])
         db.session.add(row_dat)
         db.session.commit()
+
+    return 1
 
 
 if __name__ == "__main__":

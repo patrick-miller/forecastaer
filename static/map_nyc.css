@@ -1,3 +1,7 @@
+/*****************************************************************************
+CSS
+*****************************************************************************/
+
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
@@ -120,23 +124,6 @@ CONTENT
 }
 
 
-#my_loc, #my_loc table {
-    color: black;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-
-    font-size: 2.5vw;
-}
-
-.my_loc_label {
-    text-align: left;
-}
-
-.my_loc_output {
-    text-align: right;
-}
-
 #grid path {
     vector-effect: non-scaling-stroke;
 }
@@ -160,3 +147,40 @@ CONTENT
     width: 8000px;
     height: 8000px;
 }
+
+
+/*****************************************************************************
+MEDIA QUERIES FOR MOBILE
+*****************************************************************************/
+
+@media only screen and (max-device-width: 720px),
+       only screen and (max-width: 720px),
+       only screen and (orientation: portrait){
+
+    // Top bar
+
+    #units_toggle {
+        display: none;
+    }
+
+    #location_input{
+        width: 160px;
+    }
+
+    #logo {
+        display: none;
+    }
+
+    // Content container
+
+    #d3map {
+        width: 0%;
+        display: none;
+    }
+
+    #loc_container {
+        width: 100%;
+    }
+
+}
+
