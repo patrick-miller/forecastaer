@@ -61,8 +61,8 @@ def FrontPage():
     return render_template('map_nyc.html')
 
 
-@app.route('/current_grid_data.csv')
-def CSVPage_current_grid_data():
+@app.route('/grid_data.csv')
+def CSVPage_grid_data():
     """
     Query the most recent grid data from database, output as a .csv
     """

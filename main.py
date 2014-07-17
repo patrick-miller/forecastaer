@@ -320,6 +320,39 @@ def get_interpolated_grid_data(station_data, aq_variables):
     return locs_data
 
 
+def predict_stations_data(stations_dat, forecast_periods):
+    """
+    Predict the stations data into the future
+    """
+    last_time = stations_dat['DateTime'].max()
+    stations_grouped = stations_dat.groupby(['station', 'lat', 'lon'])
+
+    all_forecasts = pd.DataFrame()
+
+    for fp in range(1, forecast_periods + 1):
+        station_preds = stations_grouped.apply(predict_station).reset_index(drop=True)
+        station_preds['DateTime'] = last_time + dt.timedelta(hours=fp)
+
+        all_forecasts = all_forecasts.append(station_preds)
+
+    return all_forecasts
+
+
+def predict_station(var_series):
+    """
+    Predict the next in the time series
+    """
+    #TODO: currently random, make meaningful
+
+    last_value = var_series[-1:]
+
+    #last_value['AQI'] += np.random.uniform(-1, 1) * (last_value['AQI'] / 10)
+    last_value['PM25'] += np.random.uniform(-1, 1) * (last_value['PM25'] / 10)
+    last_value['O3'] += np.random.uniform(-1, 1) * (last_value['O3'] / 10)
+
+    return last_value
+
+
 def get_breakpoints():
     breaks_file = DataDir + '/breakpoints.csv'
     breakpoints = pd.read_csv(breaks_file)
@@ -335,6 +368,8 @@ def main():
     print 'Begin main'
 
     aq_variables = ['PM25', 'O3', 'AQI']
+    hist_periods = 7
+    forecast_periods = 5
 
     all_stations = get_stations()
     breakpoints = get_breakpoints()
@@ -345,31 +380,41 @@ def main():
 
     print 'Get station data'
 
-    station_data, aq_stations = get_station_raw_data(all_stations, start_date,
-                                                     end_date)
+    station_data_raw, aq_stations = get_station_raw_data(all_stations, start_date,
+                                                         end_date)
 
     print 'Finished getting station data'
 
-    stations_ffilled = station_data.groupby('station').fillna(method='ffill')
-    stations_ffilled['station'] = station_data['station']
+    stations_ffilled = station_data_raw.groupby('station').fillna(method='ffill')
+    stations_ffilled['station'] = station_data_raw['station']
 
-    max_time = stations_ffilled['DateTime'].max()
+    stations_predictions = predict_stations_data(stations_ffilled, forecast_periods)
 
-    print 'Calculating AQI'
+    all_station_data = stations_ffilled.append(stations_predictions)
 
-    # Current station data
-    stations_output = calculate_stations_aqi_data(stations_ffilled, breakpoints, aq_variables)
+    time_stamps = all_station_data['DateTime'].unique()[
+                    -(hist_periods+forecast_periods):]
 
-    print 'Interpolating over grid'
+    all_grid_data = pd.DataFrame()
 
-    # Interpolate the grid data
-    current_grid_data = get_interpolated_grid_data(stations_output, aq_variables)
+    print 'Calculating AQI and Interpolating over grid'
+    for ts in time_stamps:
+        station_time = all_station_data[all_station_data['DateTime'] <= ts]
 
-    current_grid_data['time'] = max_time
+        # Current station data
+        stations_output = calculate_stations_aqi_data(station_time,
+                                                      breakpoints, aq_variables)
+
+        # Interpolate the grid data
+        current_grid_data = get_interpolated_grid_data(stations_output,
+                                                       aq_variables)
+
+        current_grid_data['time'] = ts
+        all_grid_data = all_grid_data.append(current_grid_data)
 
     print 'Finished main'
 
-    return current_grid_data
+    return all_grid_data
 
 
 

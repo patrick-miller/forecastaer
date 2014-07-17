@@ -1,6 +1,3 @@
-
-// Zooming and panning does not work on mobile well
-// TODO: enable for desktop
 // TODO: change marker type
 
 var m_top = 4000,
@@ -33,13 +30,12 @@ var mapOptions = {
     keyboardShortcuts: false
 };
 
-var current_grid_data = d3.map();
+var all_grid_data = d3.map();
 
 //Spinner
 var spinner = new Spinner();
 var spin_target = document.getElementById('loading');
 spinner.spin(spin_target);
-
 
 
 
@@ -49,15 +45,25 @@ queue()
     .defer(d3.json, "/static/grid.geojson")
     .defer(d3.csv, "/static/grid_locs.csv")
     .defer(d3.csv, "/static/breakpoints.csv")
-    .defer(d3.csv, "/current_grid_data.csv", function(d) {
-        current_grid_data.set(Math.round(d.gr_id), d); })
+    .defer(d3.csv, "/grid_data.csv")
     .await(ready);
 
 var marker;
 
-function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
+function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_dat){
 
     if (error) return console.error(error);
+
+    for(ndx=0; ndx < grid_dat.length; ndx++){
+        ggg = grid_dat[ndx];
+        g_dat = all_grid_data.get(ggg.gr_id);
+
+        if(typeof(g_dat) == "undefined"){
+            all_grid_data.set(ggg.gr_id, [ggg]);
+        }else{
+            all_grid_data.set(ggg.gr_id, g_dat.concat([ggg]));
+        }
+    }
 
     var selected_metric = 'AQI';
     var geocoder = new google.maps.Geocoder();
@@ -93,7 +99,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
             if(metric == "PM25"){
                 val = parseFloat(breakpoints[x].PM25_24hr);
             }else if(metric == "O3"){
-                console.log(breakpoints);
                 val = parseFloat(breakpoints[x].O3_1hr);
             }else if(metric == "AQI"){
                 val = parseFloat(breakpoints[x].Index);
@@ -196,7 +201,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
                     .enter().append("path")
                     .attr("d", path)
                     .on("click", function(d) {
-                        console.log(d);
                         setGridLocation(d.properties.id);
                     })
                     .style("fill", function(d) {
@@ -273,6 +277,26 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
     DATA FUNCTIONS
     */
 
+    function getCurrentLocMetric(gr_id, metric){
+        var loc_dat_time = getCurrentLocData(gr_id);
+
+        return loc_dat_time[metric];
+    }
+
+    function getCurrentLocData(gr_id){
+        var loc_dat = all_grid_data.get(gr_id);
+
+        var time = new Date()
+
+        for(ndx=0; ndx < loc_dat.length; ndx++){
+            var n_time = new Date(loc_dat[ndx].time);
+            if(time >= n_time){
+                return loc_dat[ndx];
+            }
+        }
+        return loc_dat[ndx-1];
+    }
+
     function geocodeLocation(address){
 
         //Add on New York to narrow the location
@@ -292,20 +316,10 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
 
     // On mouse click or text input submission
     function setGridLocation(gr_id){
-        var loc_data = getLocData(gr_id);
+        var loc_data = all_grid_data.get(gr_id);
         var loc_position = grid_locs[gr_id];
 
         setPosition(loc_position['c_lat'], loc_position['c_lon'], gr_id);
-    }
-
-    function getLocData(gr_id){
-        return current_grid_data.get(gr_id);
-    }
-
-    function getCurrentLocMetric(gr_id, metric){
-        curr_loc = getLocData(gr_id);
-
-        return curr_loc[metric];
     }
 
     function setPosition(lat, lon, grid_id){
@@ -315,7 +329,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
         }
 
         if(grid_id > -1){
-            var loc_data = getLocData(grid_id);
+            var loc_data = all_grid_data.get(grid_id);
             visualizeLocData(loc_data);
 
             marker.setPosition(new google.maps.LatLng([lat], [lon]));
@@ -349,19 +363,160 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints){
                 grid_loc.s_lat <= lat);
     }
 
-    // Visualization
+    //
+    // Visualization: d3 bar charts
+    //
+
+    // globals
+
+    var margin = {top:10, right:22, bottom:45, left:38},
+        outerWidth = 300,
+        outerHeight = 240,
+        width = outerWidth - margin.left - margin.right,
+        height = outerHeight - margin.top - margin.bottom;
+
+    // X and Y scales
+    var x_scale = d3.time.scale().range([0, width]);
+    var y_scale = d3.scale.linear().range([height, 0]);
+
     function visualizeLocData(loc_data){
         //TODO: d3 bar charts
 
-        d3.select("#curr_loc_PM25")
-            .text("" + parseFloat(loc_data["PM25"]).toFixed(1));
-        d3.select("#curr_loc_O3")
-            .text("" + parseFloat(loc_data["O3"]).toFixed(1));
-        d3.select("#curr_loc_AQI")
-            .text("" + parseFloat(loc_data["AQI"]).toFixed(1));
+        var timestamps = loc_data.map(function(d){
+            return new Date(d.time);
+        });
+
+        x_scale.domain(d3.extent(timestamps));
+
+        var barWidth = width / loc_data.length;
+
+        d3.select("#chart_AQI").remove();
+        d3.select("#chart_PM25").remove();
+        d3.select("#chart_O3").remove();
+
+        var chart_AQI = d3.select("#wrapper_AQI")
+            .append("svg").attr("id", "chart_AQI");
+        var chart_PM25 = d3.select("#wrapper_PM25")
+            .append("svg").attr("id", "chart_PM25");
+        var chart_O3 = d3.select("#wrapper_O3")
+            .append("svg").attr("id", "chart_O3");
+
+        createBarChart(chart_AQI, "AQI");
+        createBarChart(chart_PM25, "PM25");
+        createBarChart(chart_O3, "O3");
+
+        function createBarChart(chart, metric){
+
+            //TODO:
+            // Scale domain based on breakpoints
+            var upper_break = 10000;
+
+            /*
+            if(metric == "AQI"){
+                upper_break = 500;
+            }else if(metric == "PM25"){
+                upper_break = 50;
+            }else if(metric == "O3"){
+                upper_break = 100;
+            }
+            */
+
+            // Set 120% the max value found as the upper scale
+            var max_value = 1.2 * Math.max.apply(null, loc_data.map(function(d) {
+                return d[metric];
+            }));
+            if(max_value > upper_break){
+                max_value = upper_break;
+            }
+
+            y_scale.domain([0, max_value]);
+
+            // Initialize the bar chart
+            chart = chart
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Create the groups and then the bars
+            var bar_group = chart.selectAll("g")
+                .data(loc_data)
+                .enter().append("g")
+                .attr("transform", function(d, i){
+                    return "translate(" + (x_scale(new Date(d.time))) + ",0)";
+                 })
+                .style("fill", function(d) {
+                    var loc_metric = d[metric];
+                    var color = getColor(loc_metric, metric);
+
+                    return color;
+                })
+                .style("fill-opacity", function(d) {
+                    var loc_metric = d[metric];
+                    var alpha = getAlpha(loc_metric, metric);
+
+                    return alpha;
+                });
+
+
+            bar_group.append("rect")
+                .attr("y", function(d) { return y_scale(d[metric]); })
+                .attr("height", function(d) {
+                    return height - y_scale(d[metric]);
+                 })
+                .attr("width", barWidth);
+
+            // Axes
+            var xAxis = d3.svg.axis()
+                .scale(x_scale)
+                .orient("bottom")
+                .tickFormat(d3.time.format("%H:%M"));
+
+            var yAxis = d3.svg.axis()
+                .scale(y_scale)
+                .orient("left");
+
+            chart.append("g")
+                .attr("class", "xAxis")
+                .attr("transform", "translate(0, " + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                .attr("dx", "-2em")
+                .attr("dy", "0.5em")
+                .attr("transform", "rotate(-90)");
+
+            chart.append("g")
+                .attr("class", "yAxis")
+                .call(yAxis);
+
+            var yTitle;
+            if(metric == "AQI"){
+                yTitle = 'AQI';
+            }else if(metric == "PM25"){
+                yTitle = 'PM 2.5 ug/m3LC';
+            }else if(metric == "O3"){
+                yTitle = 'O3 ppb';
+            }
+
+            chart.append("text")
+                .attr("class", "yTitle")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "0.8em")
+                .style("font-size", "11px")
+                .style("text-anchor", "middle")
+                .text(yTitle);
+        }
     }
 
+
+
+
+    //
     // On startup
+    //
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(successFunction, errorFunction,
         {enableHighAccuracy: true});

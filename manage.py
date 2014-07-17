@@ -16,9 +16,9 @@ def update_grid(manual=False):
     """
     Update the grid on a certain interval
     """
-    hours_of_day = [6, 9, 12, 15, 18, 21] # hours to use
+    hours_of_day = [6, 9, 12, 15, 18, 21]  # hours to use for scheduler
 
-    if not manual or dt.datetime.now().hour in hours_of_day:
+    if not (manual or dt.datetime.now().hour in hours_of_day):
         return -1
 
     # Update the data
@@ -26,7 +26,7 @@ def update_grid(manual=False):
 
     # Write data to database and delete old data
     print 'Deleting data from table CurrentGridData'
-    CurrentGridData.query.delete()
+    db.session.query(CurrentGridData).delete()
 
     print 'Writing data to table CurrentGridData'
     for row in current_data.iterrows():

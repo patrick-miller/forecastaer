@@ -7,9 +7,7 @@ body {
     margin: 0;
 }
 
-/*
-TOP BAR
-*/
+/*TOP BAR*/
 
 #searchbar {
     width: 100%;
@@ -81,49 +79,68 @@ CONTENT
 
 #container {
     width: 100%;
-
-    display: flex;
-    display: -webkit-flex;
-
-    flex-direction: row;
-    -webkit-flex-direction: row;
-
-    justify-content: space-between;
-    -webkit-justify-content: space-between;
-}
-
-#d3map {
-    margin: 0;
     height: 100%;
-    width: 75%;
+    display: flex;
 }
 
 #loc_container {
-    width: 25%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    float: right;
+    width: 400px;
+    min-height: 850px;
+    background-color: #ededed;
+
     text-align: center;
 }
 
-#curr_loc {
-    color: black;
-    margin-left: auto;
-    margin-right: auto;
+#d3map {
+    width: 100%;
+    min-height: 850px;
+    overflow: hidden;
+}
+
+/* Bar Charts */
+
+.chart_div{
+    padding: 12px;
+}
+.chart_title{
     text-align: center;
-
-    font-size: 2.5vw;
+    font-size: 16px;
+    font-weight: bold;
 }
 
-.curr_loc_label {
-    text-align: left;
+.xAxis path,
+.xAxis line,
+.yAxis path,
+.yAxis line{
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
 }
 
-.curr_loc_output {
-    text-align: right;
+.yAxis text,
+.xAxis text{
+    text-anchor: end;
+    font-size: 11px;
+}
+
+#grid path:hover {
+    stroke-width: 2px;
+    vector-effect: non-scaling-stroke;
+
+    stroke: #1c1c1c;
+    stroke-dasharray: 2,2;
+}
+
+.chart_div div svg g g rect:hover{
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+
+    stroke: #1c1c1c;
 }
 
 
+/* Map */
 #grid path {
     vector-effect: non-scaling-stroke;
 }
@@ -148,19 +165,17 @@ CONTENT
     height: 8000px;
 }
 
-
 /*****************************************************************************
 MEDIA QUERIES FOR MOBILE
 *****************************************************************************/
 
-@media only screen and (max-device-width: 720px),
-       only screen and (max-width: 720px),
-       only screen and (orientation: portrait){
+@media only screen and (max-device-width: 650px),
+       only screen and (max-width: 900px){
 
-    // Top bar
+    /* Top bar */
 
     #units_toggle {
-        display: none;
+        display: none !important;
     }
 
     #location_input{
@@ -168,14 +183,13 @@ MEDIA QUERIES FOR MOBILE
     }
 
     #logo {
-        display: none;
+        display: none !important;
     }
 
-    // Content container
+    /* Content container */
 
     #d3map {
-        width: 0%;
-        display: none;
+        display: none !important;
     }
 
     #loc_container {

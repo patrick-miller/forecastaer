@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
@@ -9,10 +9,13 @@
     <script type="text/javascript" src="https://fgnass.github.io/spin.js/spin.js"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
+    <script type="text/javascript" src="{{ url_for('static', filename='map_nyc.js') }}"></script>
+
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='map_nyc.css') }}">
 
 </head>
+
 <body>
 
 <div id="searchbar">
@@ -40,30 +43,25 @@
     <div id="loading"></div>
 
     <div id="d3map"></div>
+
     <div id="loc_container">
 
-        <table id="curr_loc" align="center">
-            <tbody>
-                <tr>
-                    <td width="40%" class="curr_loc_label">PM2.5</td>
-                    <td width="60%" id="curr_loc_PM25" class="curr_loc_output">-</td>
-                </tr>
-                <tr>
-                    <td width="40%" class="curr_loc_label">O3</td>
-                    <td width="60%" id="curr_loc_O3" class="curr_loc_output">-</td>
-                </tr>
-                <tr>
-                    <td width="40%" class="curr_loc_label">AQI</td>
-                    <td width="60%" id="curr_loc_AQI" class="curr_loc_output">-</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="chart_div">
+            <div class="chart_title">Air Quality Index</div>
+            <div id="wrapper_AQI"></div>
+        </div>
+        <div class="chart_div">
+            <div class="chart_title">PM 2.5</div>
+            <div id="wrapper_PM25"></div>
+        </div>
+        <div class="chart_div">
+            <div class="chart_title">O3</div>
+            <div id="wrapper_O3"></div>
+        </div>
 
     </div>
 
 </div>
-
-<script type="text/javascript" src="{{ url_for('static', filename='map_nyc.js') }}"></script>
 
 </body>
 
