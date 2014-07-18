@@ -289,29 +289,39 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
         var time = new Date()
 
         for(ndx=0; ndx < loc_dat.length; ndx++){
-            var n_time = new Date(loc_dat[ndx].time);
-            if(time >= n_time){
+            var n_time = parseDate(loc_dat[ndx].time);
+            console.log(loc_dat[ndx].time);
+            if(time <= n_time){
                 return loc_dat[ndx];
             }
         }
+
         return loc_dat[ndx-1];
     }
 
     function geocodeLocation(address){
 
         //Add on New York to narrow the location
-        address += ', New York, NY';
+        var address_full = address +  ', New York, NY';
 
-        geocoder.geocode({'address': address}, function(results, status){
+        var status;
+        geocoder.geocode({'address': address_full}, function(results, status){
 
             if (status == google.maps.GeocoderStatus.OK) {
                 var lat = results[0].geometry.location.lat();
                 var lon = results[0].geometry.location.lng();
 
-                setPosition(lat, lon);
+                status = setPosition(lat, lon);
+            }else{
+                status = -1;
             }
         });
-
+        if(status == -1){
+            document.getElementById("loc_show").innerHTML =
+                'Invalid location, using NYC';
+        }else{
+            document.getElementById("loc_show").innerHTML = address;
+        }
     }
 
     // On mouse click or text input submission
@@ -320,6 +330,10 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
         var loc_position = grid_locs[gr_id];
 
         setPosition(loc_position['c_lat'], loc_position['c_lon'], gr_id);
+
+        document.getElementById("loc_show").innerHTML =
+            "[" + parseFloat(loc_position['c_lat']).toFixed(2) + ", " +
+                parseFloat(loc_position['c_lon']).toFixed(2) + "]";
     }
 
     function setPosition(lat, lon, grid_id){
@@ -333,6 +347,9 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
             visualizeLocData(loc_data);
 
             marker.setPosition(new google.maps.LatLng([lat], [lon]));
+            return(grid_id);
+        }else{
+            return -1;
         }
 
     }
@@ -379,11 +396,11 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
     var x_scale = d3.time.scale().range([0, width]);
     var y_scale = d3.scale.linear().range([height, 0]);
 
-    function visualizeLocData(loc_data){
-        //TODO: d3 bar charts
 
+    // Column charts
+    function visualizeLocData(loc_data){
         var timestamps = loc_data.map(function(d){
-            return new Date(d.time);
+            return parseDate(d.time);
         });
 
         x_scale.domain(d3.extent(timestamps));
@@ -439,12 +456,17 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             // Create the groups and then the bars
-            var bar_group = chart.selectAll("g")
+            var bar = chart.selectAll("g")
                 .data(loc_data)
-                .enter().append("g")
+                .enter().append("rect")
                 .attr("transform", function(d, i){
-                    return "translate(" + (x_scale(new Date(d.time))) + ",0)";
+                    return "translate(" + (x_scale(parseDate(d.time))) + ",0)";
                  })
+                .attr("y", function(d) { return y_scale(d[metric]); })
+                .attr("height", function(d) {
+                    return height - y_scale(d[metric]);
+                 })
+                .attr("width", barWidth)
                 .style("fill", function(d) {
                     var loc_metric = d[metric];
                     var color = getColor(loc_metric, metric);
@@ -457,14 +479,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
 
                     return alpha;
                 });
-
-
-            bar_group.append("rect")
-                .attr("y", function(d) { return y_scale(d[metric]); })
-                .attr("height", function(d) {
-                    return height - y_scale(d[metric]);
-                 })
-                .attr("width", barWidth);
 
             // Axes
             var xAxis = d3.svg.axis()
@@ -510,12 +524,13 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
         }
     }
 
-
-
-
     //
     // On startup
     //
+
+    //Original initialization
+    initialize();
+    setPosition(40.71, -74.01);
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(successFunction, errorFunction,
@@ -538,8 +553,21 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
         setPosition(lat, lon);
     }
 
-    //Original initialization
-    initialize();
+    // Reinitialize on changing size
     google.maps.event.addDomListener(window, 'resize', initialize);
 }
 
+
+// UTILITY Date Parsing
+
+function parseDate(input) {
+    var day_parts = input.split(' ');
+    var day_part = day_parts[0].split('-');
+    var time_part = day_parts[1].split(':');
+
+    // Note: months are 0-based
+    var x = new Date(day_part[0], day_part[1]-1, day_part[2],
+        time_part[0], time_part[1], time_part[2]);
+
+    return(x);
+}

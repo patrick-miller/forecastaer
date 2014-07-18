@@ -360,7 +360,7 @@ def get_breakpoints():
     return breakpoints
 
 
-@timeout(60)
+@timeout(90)
 def main():
     """
     Main function: times out after 60 seconds
@@ -368,8 +368,8 @@ def main():
     print 'Begin main'
 
     aq_variables = ['PM25', 'O3', 'AQI']
-    hist_periods = 7
-    forecast_periods = 5
+    hist_periods = 6
+    forecast_periods = 6
 
     all_stations = get_stations()
     breakpoints = get_breakpoints()
