@@ -93,7 +93,7 @@ CONTENT
     float: right;
     width: 360px;
     min-width: 360px;
-    min-height: 900px;
+    min-height: 950px;
     height: 100%;
     background-color: #ededed;
 
@@ -101,7 +101,7 @@ CONTENT
 }
 
 #d3map {
-    min-height: 900px;
+    min-height: 950px;
     height: 100%;
     overflow: hidden;
 }

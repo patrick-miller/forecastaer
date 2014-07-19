@@ -1,7 +1,5 @@
 __author__ = 'pwmiller'
 
-# TODO: 800px min
-
 
 import os
 import sys

@@ -286,11 +286,10 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
     function getCurrentLocData(gr_id){
         var loc_dat = all_grid_data.get(gr_id);
 
-        var time = new Date()
+        var time = new Date();
 
         for(ndx=0; ndx < loc_dat.length; ndx++){
             var n_time = parseDate(loc_dat[ndx].time);
-            console.log(loc_dat[ndx].time);
             if(time <= n_time){
                 return loc_dat[ndx];
             }
