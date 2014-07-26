@@ -209,7 +209,7 @@ def calculate_stations_aqi_data(station_data, breakpoints, aq_variables):
                                              axis=1)
 
     stations_out.reset_index(level=[0,1,2], inplace=True)
-    stations_out = stations_out[['station', 'lon', 'lat', 'PM25_24hr', 'O3_1hr', 'AQI']]
+    stations_out = stations_out[['station', 'lon', 'lat', 'PM25_24hr', 'O3_8hr', 'AQI']]
     stations_out.columns = ['station', 'lon', 'lat', 'PM25', 'O3', 'AQI']
 
     stations_out = pd.melt(stations_out,
