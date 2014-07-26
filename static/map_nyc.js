@@ -79,7 +79,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
             if(metric == "PM25"){
                 domain.push(parseFloat(breakpoints[x].PM25_24hr));
             }else if(metric == "O3"){
-                domain.push(parseFloat(breakpoints[x].O3_1hr));
+                domain.push(parseFloat(breakpoints[x].O3_8hr));
             }else if(metric == "AQI"){
                 domain.push(parseFloat(breakpoints[x].Index));
             }
@@ -99,7 +99,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
             if(metric == "PM25"){
                 val = parseFloat(breakpoints[x].PM25_24hr);
             }else if(metric == "O3"){
-                val = parseFloat(breakpoints[x].O3_1hr);
+                val = parseFloat(breakpoints[x].O3_8hr);
             }else if(metric == "AQI"){
                 val = parseFloat(breakpoints[x].Index);
             }
@@ -300,27 +300,44 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
 
     function geocodeLocation(address){
 
-        //Add on New York to narrow the location
-        var address_full = address +  ', New York, NY';
-
-        var status;
-        geocoder.geocode({'address': address_full}, function(results, status){
+        var out_loc = 0;
+        geocoder.geocode({'address': address}, function(results, status){
 
             if (status == google.maps.GeocoderStatus.OK) {
                 var lat = results[0].geometry.location.lat();
                 var lon = results[0].geometry.location.lng();
 
-                status = setPosition(lat, lon);
+                out_loc = setPosition(lat, lon);
             }else{
-                status = -1;
+                out_loc = -1;
+            }
+
+            if(out_loc >= 0){
+                document.getElementById("loc_show").innerHTML = address;
+                document.getElementById("loc_show").style.color = "black";
+            }else{
+                //Try with tacking on NYC
+                //Add on New York to narrow the location
+                var address_full = address +  ', New York, NY';
+
+                geocoder.geocode({'address': address_full}, function(results, status){
+
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        var lat = results[0].geometry.location.lat();
+                        var lon = results[0].geometry.location.lng();
+
+                        setPosition(lat, lon);
+                        document.getElementById("loc_show").innerHTML =
+                            'defaulting to NYC search: ' + address;
+                        document.getElementById("loc_show").style.color = "red";
+                    }else{
+                        document.getElementById("loc_show").innerHTML =
+                            'Invalid location, using NYC';
+                        document.getElementById("loc_show").style.color = "red";
+                    }
+                });
             }
         });
-        if(status == -1){
-            document.getElementById("loc_show").innerHTML =
-                'Invalid location, using NYC';
-        }else{
-            document.getElementById("loc_show").innerHTML = address;
-        }
     }
 
     // On mouse click or text input submission
@@ -333,6 +350,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
         document.getElementById("loc_show").innerHTML =
             "[" + parseFloat(loc_position['c_lat']).toFixed(2) + ", " +
                 parseFloat(loc_position['c_lon']).toFixed(2) + "]";
+        document.getElementById("loc_show").style.color = "black";
     }
 
     function setPosition(lat, lon, grid_id){
@@ -346,7 +364,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
             visualizeLocData(loc_data);
 
             marker.setPosition(new google.maps.LatLng([lat], [lon]));
-            return(grid_id);
+            return grid_id;
         }else{
             return -1;
         }
@@ -365,10 +383,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
 
         //Handle case where the location is outside the grid
         // Display an error above the charts on the right, return default
-
-        //TODO: error
-
-        // A default grid number
         return -1;
     }
 
@@ -568,5 +582,5 @@ function parseDate(input) {
     var x = new Date(day_part[0], day_part[1]-1, day_part[2],
         time_part[0], time_part[1], time_part[2]);
 
-    return(x);
+    return x;
 }
