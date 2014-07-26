@@ -109,7 +109,7 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
                 if(metric == "PM25"){
                     upper = parseFloat(breakpoints[x+1].PM25_24hr);
                 }else if(metric == "O3"){
-                    upper = parseFloat(breakpoints[x+1].O3_1hr);
+                    upper = parseFloat(breakpoints[x+1].O3_8hr);
                 }else if(metric == "AQI"){
                     upper = parseFloat(breakpoints[x+1].Index);
                 }
