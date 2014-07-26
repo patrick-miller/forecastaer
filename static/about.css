@@ -1,0 +1,100 @@
+/*****************************************************************************
+CSS
+*****************************************************************************/
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    background-color: #ededed;
+}
+
+/*TOP BAR*/
+
+#searchbar {
+    width: 100%;
+    height: 55px;
+    padding: 0;
+    text-align: center;
+    background-color: #003366;
+    color: white;
+
+    font-size: 20px;
+}
+
+#logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    text-decoration: none;
+    color: white;
+}
+#logo:hover {
+    color: #FFCC00;
+}
+
+#pipe1{
+    position: absolute;
+    top: 15px;
+    left: 130px;
+    color: white;
+}
+
+
+#about {
+    position: absolute;
+    top: 15px;
+    left: 145px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+#about:hover {
+    color: #FFCC00;
+}
+
+
+.wrapper {
+    padding: 12px 24px 12px 24px;
+}
+
+
+.gridtable{
+    text-align: left;
+    min-width: 600px;
+    background-color: white;
+}
+
+.gridtable th{
+    padding: 6 6 6 6;
+    border-top: solid 1px black;
+    border-right: solid 1px black;
+    border-left: solid 1px black;
+ }
+
+.gridtable td{
+    min-width: 100px;
+    padding: 6 6 6 6;
+}
+
+.aqi-green {
+	background-color: #009966;
+}
+.aqi-yellow {
+	background-color:#ffde33;
+}
+.aqi-orange {
+	background-color:#ff9933;
+	color:#FFFFFF;
+}
+.aqi-red {
+	background-color:#cc0033;
+	color:#FFFFFF;
+}
+.aqi-maroon {
+	background-color:#660099;
+	color:#FFFFFF;
+}
+.aqi-purple {
+	background-color:#7e0023;
+	color:#FFFFFF;
+}

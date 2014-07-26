@@ -24,6 +24,43 @@ body {
     position: absolute;
     top: 15px;
     left: 15px;
+    text-decoration: none;
+    color: white;
+}
+#logo:hover {
+    color: #FFCC00;
+}
+
+#pipe1{
+    position: absolute;
+    top: 15px;
+    left: 130px;
+    color: white;
+}
+
+#about {
+    position: absolute;
+    top: 15px;
+    left: 145px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+#about:hover {
+    color: #FFCC00;
+}
+
+#about_small {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+#about_small:hover {
+    color: #FFCC00;
 }
 
 #location_controls {
@@ -38,8 +75,6 @@ body {
 #geo_loc {
     display: inline-block;
     cursor: pointer;
-
-    font-size: 16px;
 }
 
 #location_input {
@@ -190,6 +225,18 @@ MEDIA QUERIES FOR MOBILE
 
     #units_toggle {
         display: none !important;
+    }
+
+    #about {
+        display: none !important;
+    }
+
+    #pipe1 {
+        display: none !important;
+    }
+
+    #about_small {
+        display: block;
     }
 
     #location_input{

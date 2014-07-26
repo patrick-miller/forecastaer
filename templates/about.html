@@ -1,0 +1,140 @@
+<html>
+<head>
+    <title>ForecastAer</title>
+    <meta charset="utf-8">
+    <meta name="description"
+          content="Hyperlocal, real-time air quality forecasts across New York City.">
+    <meta name="keywords" content="ForecastAer,ForecastAir,Forecast,Air Quality,AQI,ozone,PM2.5">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='about.css') }}">
+</head>
+
+<body>
+
+<div id="searchbar">
+    <a href="/">
+        <div id="logo">
+            ForecastAer
+        </div>
+    </a>
+    <div id="pipe1">|</div>
+    <a href="/about">
+        <div id="about">about</div>
+    </a>
+</div>
+
+<div class="wrapper">
+
+    <h2> About ForecastAer </h2>
+
+    <p>
+        This project's goal is to increase New Yorkers' awareness to their air quality.
+        We present real-time estimates of air quality measures at a hyperlocal level.
+        Users can interact with the current measurements on our color-coded map,
+        and also have the ability to see a time series of air quality at any selected location.
+    </p>
+
+    <br>
+
+    <h2> Understanding Air Quality  </h2>
+
+    <p>
+        Air quality, as defined by the EPA's Air Quality Index (AQI), measures how clean or polluted the air is.
+        Depending on the level of the AQI, there are various negative effects on one's health that could be experience.
+        Certain people may experience more severe problems depending on whether or not they have pre-existing conditions,
+        such as asthma or pulmonary / cardiovascular issues.
+    </p>
+    <p>
+        The AQI is calculated for 5 different pollutants: ground-level ozone, particulate matter (PM 2.5 et al.)
+        carbon monoxide, sulfur dioxide, and nitrogen dioxide. Here we present the first two (considered the largest air quality threats)
+        and a summary level AQI. The scale below details the levels of air quality that corresponds to different health effects.
+    </p>
+
+    <br>
+
+    <div align="center">
+        <table class="gridtable" style="margin-bottom:10px">
+            <tbody>
+            <tr>
+                <th> Level of Health Concern </th>
+                <th> AQI </th>
+                <th> PM 2.5 </th>
+                <th> O3 </th>
+                <th>Meaning</th>
+            </tr>
+            <tr class="aqi-green" style="font-weight:bold">
+                <td>Good</td>
+                <td>0 - 50</td>
+                <td>0 - 12</td>
+                <td>0 - 60</td>
+                <td style="text-align:left">Air quality is considered satisfactory, and air pollution poses little or no risk
+                </td>
+            </tr>
+            <tr class="aqi-yellow" style="font-weight:bold">
+                <td>Moderate</td>
+                <td>51 - 100</td>
+                <td>12.1 - 35.4</td>
+                <td>60 - 75</td>
+                <td style="text-align:left">Air quality is acceptable; however, for some pollutants there may be a moderate
+                    health concern for a very small number of people who are unusually sensitive to air pollution.
+                </td>
+            </tr>
+            <tr class="aqi-orange" style="font-weight:bold">
+                <td>Unhealthy for Sensitive Groups</td>
+                <td>101 - 150</td>
+                <td>35.5 - 55.4</td>
+                <td>75 - 95</td>
+                <td style="text-align:left">Members of sensitive groups may experience health effects. The general public is
+                    not likely to be affected.
+                </td>
+            </tr>
+            <tr class="aqi-red" style="font-weight:bold">
+                <td>Unhealthy</td>
+                <td>151 - 200</td>
+                <td>55.5 - 150.4</td>
+                <td>95 - 115</td>
+                <td style="text-align:left">Everyone may begin to experience health effects; members of sensitive groups may
+                    experience more serious health effects.
+                </td>
+            </tr>
+            <tr class="aqi-purple" style="font-weight:bold">
+                <td>Very Unhealthy</td>
+                <td>201 - 300</td>
+                <td>150.5 - 250.4</td>
+                <td>115 - 375</td>
+                <td style="text-align:left">Health warnings of emergency conditions. The entire population is more likely to
+                    be affected.
+                </td>
+            </tr>
+            <tr class="aqi-maroon" style="font-weight:bold">
+                <td>Hazardous</td>
+                <td>301 - 500</td>
+                <td>250.5 - 500</td>
+                <td> - </td>
+                <td style="text-align:left">Health alert: everyone may experience more serious health effects</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <br>
+
+    <h2> Data Source</h2>
+    <p>
+        <a href="http://www.dec.ny.gov/"> New York State Department of Environmental Conservation</a>
+    </p>
+
+    <br>
+
+    <h2> Contact </h2>
+    <p>
+        If you have questions or want to contribute to the project, contact ForecastAer at forecastaer1 [at] gmail [dot] com.
+    </p>
+
+
+</div>
+
+</body>

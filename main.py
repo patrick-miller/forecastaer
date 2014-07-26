@@ -368,8 +368,8 @@ def main():
     print 'Begin main'
 
     aq_variables = ['PM25', 'O3', 'AQI']
-    hist_periods = 6
-    forecast_periods = 6
+    hist_periods = 5
+    forecast_periods = 7
 
     all_stations = get_stations()
     breakpoints = get_breakpoints()

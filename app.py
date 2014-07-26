@@ -59,6 +59,11 @@ def FrontPage():
     return render_template('map_nyc.html')
 
 
+@app.route('/about')
+def AboutPage():
+    return render_template('about.html')
+
+
 @app.route('/grid_data.csv')
 def CSVPage_grid_data():
     """
