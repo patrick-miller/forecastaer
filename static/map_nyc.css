@@ -239,6 +239,11 @@ MEDIA QUERIES FOR MOBILE
         display: block;
     }
 
+    #searchbar{
+        text-align: left;
+        padding-left: 12px;
+    }
+
     #location_input{
         width: 160px;
     }
