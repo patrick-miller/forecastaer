@@ -342,13 +342,9 @@ def predict_station(var_series):
     """
     Predict the next in the time series
     """
-    #TODO: currently random, make meaningful
+    #TODO: build prediction model here
 
     last_value = var_series[-1:]
-
-    #last_value['AQI'] += np.random.uniform(-1, 1) * (last_value['AQI'] / 10)
-    last_value['PM25'] += np.random.uniform(-1, 1) * (last_value['PM25'] / 10)
-    last_value['O3'] += np.random.uniform(-1, 1) * (last_value['O3'] / 10)
 
     return last_value
 
@@ -363,7 +359,7 @@ def get_breakpoints():
 @timeout(90)
 def main():
     """
-    Main function: times out after 60 seconds
+    Main function: times out after 90 seconds
     """
     print 'Begin main'
 
