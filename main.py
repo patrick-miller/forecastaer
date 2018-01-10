@@ -1,5 +1,3 @@
-__author__ = 'pwmiller'
-
 import datetime as dt
 import urllib
 import requests
@@ -14,12 +12,7 @@ import csv
 
 from timeout import timeout
 
-
 DataDir = '/app/static'
-#DataDir = 'static'   # TODO: remove this
-
-
-#TODO: sanity checks, Port Richmond < 0
 
 
 class DECStation:
@@ -28,9 +21,6 @@ class DECStation:
         self.name = name
         self.lon = lon
         self.lat = lat
-
-        #self.channels = channels
-        #self.url = self.set_station_url()
 
     def get_station_url(self, start_date, end_date):
         """ Get url for a particular station"""
@@ -136,8 +126,7 @@ def get_station_raw_data(stations, start_date, end_date):
         response = session.get(url, allow_redirects=True)
 
         if response.status_code != 200:
-            #TODO: Throw error
-            pass
+            raise Exception("Couldn't retrieve station data from: %s" %name)
 
         response_str = response.content
 
@@ -342,8 +331,6 @@ def predict_station(var_series):
     """
     Predict the next in the time series
     """
-    #TODO: build prediction model here
-
     last_value = var_series[-1:]
 
     return last_value
@@ -361,7 +348,7 @@ def main():
     """
     Main function: times out after 90 seconds
     """
-    print 'Begin main'
+    print('Begin main')
 
     aq_variables = ['PM25', 'O3', 'AQI']
     hist_periods = 5
@@ -374,12 +361,12 @@ def main():
     end_date = dt.date.today()
     start_date = end_date - dt.timedelta(1)
 
-    print 'Get station data'
+    print('Get station data')
 
     station_data_raw, aq_stations = get_station_raw_data(all_stations, start_date,
                                                          end_date)
 
-    print 'Finished getting station data'
+    print('Finished getting station data')
 
     stations_ffilled = station_data_raw.groupby('station').fillna(method='ffill')
     stations_ffilled['station'] = station_data_raw['station']
@@ -393,7 +380,7 @@ def main():
 
     all_grid_data = pd.DataFrame()
 
-    print 'Calculating AQI and Interpolating over grid'
+    print('Calculating AQI and Interpolating over grid')
     for ts in time_stamps:
         station_time = all_station_data[all_station_data['DateTime'] <= ts]
 
@@ -408,9 +395,6 @@ def main():
         current_grid_data['time'] = ts
         all_grid_data = all_grid_data.append(current_grid_data)
 
-    print 'Finished main'
+    print('Finished main')
 
     return all_grid_data
-
-
-

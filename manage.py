@@ -1,12 +1,10 @@
-__author__ = 'pwmiller'
-
 from flask.ext.script import Manager
 
 from app import app
 from app import db
 from app import CurrentGridData
 
-from main import *
+from main import main
 
 manager = Manager(app)
 
@@ -25,10 +23,10 @@ def update_grid(manual=False):
     current_data = main()
 
     # Write data to database and delete old data
-    print 'Deleting data from table CurrentGridData'
+    print('Deleting data from table CurrentGridData')
     db.session.query(CurrentGridData).delete()
 
-    print 'Writing data to table CurrentGridData'
+    print('Writing data to table CurrentGridData')
     for row in current_data.iterrows():
         row = row[1]
         row_dat = CurrentGridData(row['gr_id'], row['PM25'], row['O3'],

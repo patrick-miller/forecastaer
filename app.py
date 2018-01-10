@@ -1,6 +1,3 @@
-__author__ = 'pwmiller'
-
-
 import os
 import sys
 import logging
@@ -12,10 +9,7 @@ from flask import url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
-
-#
 # Configuration
-#
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
@@ -23,9 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 
-#
 # Models
-#
 
 class CurrentGridData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,10 +41,7 @@ class CurrentGridData(db.Model):
                          str(round(self.AQI, 2)),
                          str(self.time)]) + '\n'
 
-
-#
 # Handlers
-#
 
 @app.route('/')
 def FrontPage():
@@ -69,8 +58,6 @@ def CSVPage_grid_data():
     """
     Query the most recent grid data from database, output as a .csv
     """
-    #TODO: cache the data
-
     all_data = CurrentGridData.query.all()
 
     out = 'gr_id,PM25,O3,AQI,time\n'
