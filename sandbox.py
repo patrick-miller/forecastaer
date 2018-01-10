@@ -12,8 +12,6 @@ def output_grid_information():
     """
     Creates the grid and outputs a GeoJSON and a CSV file
     """
-
-    #TODO: make a TopoJSON file instead
     # translate = [-74.26, 40.50]
     # scale = [0.02, 0.02]
     # step = 1

@@ -1,5 +1,3 @@
-__author__ = 'pwmiller'
-
 from functools import wraps
 import errno
 import os
