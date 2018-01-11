@@ -104,7 +104,7 @@ def get_station_raw_data(stations, start_date, end_date):
     for name, station in stations.items():
 
         # Navigate to the webpage
-        url = station.get_station_url(start_date, end_date)
+        url = station.get_station_url()
         
         driver.get(url)
         driver.find_element_by_id('btnGenerateReport').click()
@@ -112,10 +112,10 @@ def get_station_raw_data(stations, start_date, end_date):
         # Scrape the content
         content = driver.page_source
 
-        soup = bs4.BeautifulSoup(content, 'html5lib')
+        soup = bs4.BeautifulSoup(content)
         table = soup.find(attrs={'id': 'C1WebGrid1'})        
         
-        df = pd.read_html(str(table), header=0, flavor='html5lib')[0]
+        df = pd.read_html(str(table), header=0, flavor='bs4')[0]
         
         # Keep columns and parse
         cols_keep = list(set(df.columns).intersection(set(website_cols)))
@@ -149,6 +149,8 @@ def get_station_raw_data(stations, start_date, end_date):
         df_filtered.rename({'PM25C': 'PM25', 'Date Time': 'DateTime'}, inplace = True)
         
         all_data = all_data.append(df_filtered, ignore_index=True)
+        
+    driver.quit()
 
     return all_data
 

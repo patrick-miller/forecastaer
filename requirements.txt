@@ -18,7 +18,6 @@ pyparsing==2.0.2
 python-dateutil==2.2
 pytz==2014.4
 scipy==0.15.1
-six==1.7.3
 tornado==3.2.2
 wsgiref==0.1.2
 zope.interface==4.1.1
