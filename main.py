@@ -98,7 +98,7 @@ def get_station_raw_data(stations, start_date, end_date):
     display = Display(visible=0, size=(800, 600))
     display.start()
                
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
 
     for name, station in stations.iteritems():
 
