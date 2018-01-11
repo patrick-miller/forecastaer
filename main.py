@@ -112,7 +112,6 @@ def get_station_raw_data(stations, start_date, end_date):
         url = station.get_station_url(start_date, end_date)
         
         driver.get(url)
-        # driver.find_element_by_id('RadioButtonList1_3').click() # Excel file option
         driver.find_element_by_id('btnGenerateReport').click()
 
         # Scrape the content
