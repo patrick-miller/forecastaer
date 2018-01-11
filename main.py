@@ -97,14 +97,19 @@ def get_station_raw_data(stations, start_date, end_date):
     # Start up a virtual display
     # display = Display(visible=0, size=(800, 600))
     # display.start()
-               
-    driver = webdriver.Chrome()
+   
+    chrome_bin = os.environ.get('GOOGLE_CHROME_SHIM')
+    if chrome_bin:
+        options = webdriver.ChromeOptions()
+        options.binary_location = chrome_bin
+        driver = webdriver.Chrome(chrome_options = options)
+    else:    
+        driver = webdriver.Chrome()
 
     for name, station in stations.items():
 
         # Navigate to the webpage
-        # url = station.get_station_url(start_date, end_date)
-        url = 'http://www.nyaqinow.net/StationReportFast.aspx?ST_ID=46'
+        url = station.get_station_url(start_date, end_date)
         
         driver.get(url)
         # driver.find_element_by_id('RadioButtonList1_3').click() # Excel file option
@@ -113,10 +118,10 @@ def get_station_raw_data(stations, start_date, end_date):
         # Scrape the content
         content = driver.page_source
 
-        soup = bs4.BeautifulSoup(content)
+        soup = bs4.BeautifulSoup(content, 'html5lib')
         table = soup.find(attrs={'id': 'C1WebGrid1'})        
         
-        df = pd.read_html(str(table), header=0)[0]
+        df = pd.read_html(str(table), header=0, flavor='html5lib')[0]
         
         # Keep columns and parse
         cols_keep = list(set(df.columns).intersection(set(website_cols)))
