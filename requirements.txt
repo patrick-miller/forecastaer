@@ -24,3 +24,6 @@ six==1.7.3
 tornado==3.2.2
 wsgiref==0.1.2
 zope.interface==4.1.1
+selenium==3.4.3
+beautifulsoup4==4.6.0
+PyVirtualDisplay==0.2.1
