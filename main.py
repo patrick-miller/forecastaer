@@ -1,4 +1,5 @@
 import datetime as dt
+from dateutil import parser
 import os
 import pandas as pd
 import numpy as np
@@ -68,13 +69,6 @@ def get_stations():
 
     return all_stations
 
-        
-def parse_date(x):
-    try: 
-        return parser.parse(x)
-    except:
-        return None
-        
 def parse_to_float(x):
     try: 
         return float(x)
@@ -88,7 +82,7 @@ def get_station_raw_data(stations, start_date, end_date):
 
     # Defaults
     website_cols = ['Date Time', 'O3', 'PM25C', 'SO2', 'CO']    
-    polished_names = ['Date Time', 'Date', 'Time', 'station', 'lon', 'lat', 'PM25', 'O3', 'SO2', 'CO']
+    polished_names = ['Date Time', 'station', 'lon', 'lat', 'PM25', 'O3', 'SO2', 'CO']
 
     # Load into one dataframe
     all_data = pd.DataFrame()
@@ -121,7 +115,7 @@ def get_station_raw_data(stations, start_date, end_date):
         cols_keep = list(set(df.columns).intersection(set(website_cols)))
         df = df[cols_keep]
                                 
-        df['Date Time'] = df['Date Time'].map(parse_date)
+        df['Date Time'] = df['Date Time'].map(pd.to_datetime)
         col_nulls = {}
         for col in df.columns:
             if col != 'Date Time':
@@ -138,15 +132,12 @@ def get_station_raw_data(stations, start_date, end_date):
         cols_add = set(website_cols) - set(df_filtered.columns)
         for col in cols_add:
             df_filtered[col] = np.nan
-            
-        df_filtered['Date'] = df_filtered['Date Time'].map(dt.datetime.date)
-        df_filtered['Time'] = df_filtered['Date Time'].map(lambda x: dt.datetime.strftime(x, '%H:%M'))
-        
+                    
         df_filtered['station'] = name
         df_filtered['lon'] = station.lon
         df_filtered['lat'] = station.lat
         
-        df_filtered.rename({'PM25C': 'PM25', 'Date Time': 'DateTime'}, inplace = True)
+        df_filtered.rename(columns = {'PM25C': 'PM25'}, inplace = True)
         
         all_data = all_data.append(df_filtered, ignore_index=True)
         
@@ -294,14 +285,14 @@ def predict_stations_data(stations_dat, forecast_periods):
     """
     Predict the stations data into the future
     """
-    last_time = stations_dat['DateTime'].max()
+    last_time = stations_dat['Date Time'].max()
     stations_grouped = stations_dat.groupby(['station', 'lat', 'lon'])
 
     all_forecasts = pd.DataFrame()
 
     for fp in range(1, forecast_periods + 1):
         station_preds = stations_grouped.apply(predict_station).reset_index(drop=True)
-        station_preds['DateTime'] = last_time + dt.timedelta(hours=fp)
+        station_preds['Date Time'] = last_time + dt.timedelta(hours=fp)
 
         all_forecasts = all_forecasts.append(station_preds)
 
@@ -355,14 +346,14 @@ def main():
 
     all_station_data = stations_ffilled.append(stations_predictions)
 
-    time_stamps = all_station_data['DateTime'].unique()[
+    time_stamps = all_station_data['Date Time'].unique()[
                     -(hist_periods+forecast_periods):]
 
     all_grid_data = pd.DataFrame()
 
     print('Calculating AQI and Interpolating over grid')
     for ts in time_stamps:
-        station_time = all_station_data[all_station_data['DateTime'] <= ts]
+        station_time = all_station_data[all_station_data['Date Time'] <= ts]
 
         # Current station data
         stations_output = calculate_stations_aqi_data(station_time, breakpoints, aq_variables)
