@@ -255,7 +255,7 @@ def get_interpolated_grid_data(station_data, aq_variables, data_dir = '/app/stat
 
         # lon x lat - melted lons change first
         aq_v_interpolated = mlab.griddata(station_data_aqv['lat'].values, station_data_aqv['lon'].values,
-                                          station_data_aqv['value'].values, lat_locs, lon_locs, interp='nn')
+                                          station_data_aqv['value'].values, lat_locs, lon_locs, interp='linear')
 
         # Out of area locations
         out_of_area_locs = pd.melt(pd.DataFrame(aq_v_interpolated.mask))
