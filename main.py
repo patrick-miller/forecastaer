@@ -100,7 +100,7 @@ def get_station_raw_data(stations, start_date, end_date):
                
     driver = webdriver.Chrome()
 
-    for name, station in stations.iteritems():
+    for name, station in stations.items():
 
         # Navigate to the webpage
         # url = station.get_station_url(start_date, end_date)
@@ -196,7 +196,7 @@ def calculate_aqi(station_obs, breakpoints):
     """
 
     aqi = 0
-    for name, value in station_obs.iteritems():
+    for name, value in station_obs.items():
         aqi = max(aqi, calculate_score(value, breakpoints, name))
 
     return aqi
