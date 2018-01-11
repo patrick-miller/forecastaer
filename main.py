@@ -95,8 +95,8 @@ def get_station_raw_data(stations, start_date, end_date):
     all_data = pd.DataFrame()
     
     # Start up a virtual display
-    display = Display(visible=0, size=(800, 600))
-    display.start()
+    # display = Display(visible=0, size=(800, 600))
+    # display.start()
                
     driver = webdriver.Chrome()
 
@@ -151,7 +151,7 @@ def get_station_raw_data(stations, start_date, end_date):
         
         all_data = all_data.append(df_filtered, ignore_index=True)
 
-    display.stop()
+    # display.stop()
 
     return all_data
 
