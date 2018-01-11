@@ -1,5 +1,3 @@
-// TODO: change marker type
-
 var m_top = 4000,
     m_left = 4000,
     center_lat = 40.71,
@@ -33,10 +31,9 @@ var mapOptions = {
 var all_grid_data = d3.map();
 
 //Spinner
-var spinner = new Spinner();
-var spin_target = document.getElementById('loading');
-spinner.spin(spin_target);
-
+//var spinner = new Spinner();
+//var spin_target = document.getElementById('loading');
+//spinner.spin(spin_target);
 
 
 // Queue up the data files
@@ -372,8 +369,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
     }
 
     function getGridId(lat, lon){
-        //TODO: optimize this
-
         // Check each grid location sequentially
         for(ndx=0; ndx < grid_locs.length; ndx++){
             if(isInside(lat, lon, grid_locs[ndx])){
@@ -437,7 +432,6 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
 
         function createBarChart(chart, metric){
 
-            //TODO:
             // Scale domain based on breakpoints
             var upper_break = 10000;
 
