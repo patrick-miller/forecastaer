@@ -147,7 +147,7 @@ def get_station_raw_data(stations, start_date, end_date):
         df_filtered['lon'] = station.lon
         df_filtered['lat'] = station.lat
         
-        df_filtered.rename({'PM25C': 'PM25', 'Date Time', 'DateTime'}, inplace = True)
+        df_filtered.rename({'PM25C': 'PM25', 'Date Time': 'DateTime'}, inplace = True)
         
         all_data = all_data.append(df_filtered, ignore_index=True)
 
