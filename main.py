@@ -1,20 +1,15 @@
 import datetime as dt
-import urllib
-import requests
-
+import os
 import pandas as pd
 import numpy as np
 from scipy import interpolate
 from matplotlib import mlab
-
-from StringIO import StringIO
-import csv
+from selenium import webdriver
+import bs4
 
 from timeout import timeout
 
-DataDir = '/app/static'
-
-
+  
 class DECStation:
     def __init__(self, number, name, lon, lat):
         self.number = number
@@ -22,38 +17,11 @@ class DECStation:
         self.lon = lon
         self.lat = lat
 
-    def get_station_url(self, start_date, end_date):
+    def get_station_url(self):
         """ Get url for a particular station"""
-        base_url = get_DEC_url_components(start_date, end_date)
+        url =  'http://www.nyaqinow.net/StationReportFast.aspx?&ST_ID=%s' %self.number
 
-        #channel_param = ''.join(['channel' + str(n) + '=on&' for n in self.channels])
-        channel_param = ''.join(['channel' + str(n) + '=on&' for n in range(1, 20)])
-
-        station_params = 'stationNo=' + str(self.number)
-
-        return base_url + '&' + channel_param + station_params
-
-
-def get_DEC_url_components(start_date, end_date):
-    """Create the base URL"""
-
-    web_url = 'http://www.dec.ny.gov/airmon/retrieveResults.php?'
-
-    date_param = 'startDate=' + \
-        urllib.quote_plus(dt.date.strftime(start_date, '%d/%m/%Y')) + \
-        '&outputStartDate=' + \
-        urllib.quote_plus(dt.date.strftime(start_date, '%B %d, %Y')) + \
-        '&endDate=' + \
-        urllib.quote_plus(dt.date.strftime(end_date, '%d/%m/%Y')) + \
-        '&outputEndDate=' + \
-        urllib.quote_plus(dt.date.strftime(end_date, '%B %d, %Y'))
-
-    other_params = '&timebase=60&direction=back&reports=CSV' \
-                   '&submitButton=Create+Report&numOfChannels=20'
-
-    base_url = web_url + date_param + other_params
-
-    return base_url
+        return url
 
 
 def get_stations():
@@ -100,78 +68,91 @@ def get_stations():
 
     return all_stations
 
-
+        
+def parse_date(x):
+    try: 
+        return parser.parse(x)
+    except:
+        return None
+        
+def parse_to_float(x):
+    try: 
+        return float(x)
+    except:
+        return np.nan
+                
 def get_station_raw_data(stations, start_date, end_date):
     """
     Download the station data from airnow website
     """
 
     # Defaults
-    df_cols = ['Date(YYYY-MM-DD)', 'Time (HH24:MI)', 'station', 'lon', 'lat',
-               'PM25C ug/m3LC', 'O3 ppm', 'SO2 ppb', 'CO ppm']
-    aq_cols = ['PM25C ug/m3LC', 'O3 ppm', 'SO2 ppb', 'CO ppm']
-
-    col_names = ['Date', 'Time', 'station', 'lon', 'lat', 'PM25', 'O3', 'SO2', 'CO']
+    website_cols = ['Date Time', 'O3', 'PM25C', 'SO2', 'CO']    
+    polished_names = ['Date Time', 'Date', 'Time', 'station', 'lon', 'lat', 'PM25', 'O3', 'SO2', 'CO']
 
     # Load into one dataframe
-    aq_stations = {'PM25C ug/m3LC': [], 'O3 ppm': [], 'SO2 ppb': [], 'CO ppm': []}
     all_data = pd.DataFrame()
+       
+    chrome_bin = os.environ.get('GOOGLE_CHROME_SHIM')
+    if chrome_bin:
+        options = webdriver.ChromeOptions()
+        options.binary_location = chrome_bin
+        driver = webdriver.Chrome(chrome_options = options)
+    else:    
+        driver = webdriver.Chrome()
 
-    session = requests.session()
+    for name, station in stations.items():
 
-    for name, station in stations.iteritems():
+        # Navigate to the webpage
+        url = station.get_station_url()
+        
+        driver.get(url)
+        driver.find_element_by_id('btnGenerateReport').click()
 
-        url = station.get_station_url(start_date, end_date)
+        # Scrape the content
+        content = driver.page_source
 
-        response = session.get(url, allow_redirects=True)
+        soup = bs4.BeautifulSoup(content)
+        table = soup.find(attrs={'id': 'C1WebGrid1'})        
+        
+        df = pd.read_html(str(table), header=0, flavor='bs4')[0]
+        
+        # Keep columns and parse
+        cols_keep = list(set(df.columns).intersection(set(website_cols)))
+        df = df[cols_keep]
+                                
+        df['Date Time'] = df['Date Time'].map(parse_date)
+        col_nulls = {}
+        for col in df.columns:
+            if col != 'Date Time':
+                df[col] = df[col].map(parse_to_float)
+                col_nulls[col] = pd.isnull(df[col])
+                
+        df_nulls = pd.DataFrame(col_nulls)
+        all_nulls = df_nulls.apply(min, axis = 1)
+        
+        # Filter out bad dates and NaNs
+        df_filtered = df[-(all_nulls | pd.isnull(df['Date Time']))]
+            
+        # Add missing columns
+        cols_add = set(website_cols) - set(df_filtered.columns)
+        for col in cols_add:
+            df_filtered[col] = np.nan
+            
+        df_filtered['Date'] = df_filtered['Date Time'].map(dt.datetime.date)
+        df_filtered['Time'] = df_filtered['Date Time'].map(lambda x: dt.datetime.strftime(x, '%H:%M'))
+        
+        df_filtered['station'] = name
+        df_filtered['lon'] = station.lon
+        df_filtered['lat'] = station.lat
+        
+        df_filtered.rename({'PM25C': 'PM25', 'Date Time': 'DateTime'}, inplace = True)
+        
+        all_data = all_data.append(df_filtered, ignore_index=True)
+        
+    driver.quit()
 
-        if response.status_code != 200:
-            raise Exception("Couldn't retrieve station data from: %s" %name)
-
-        response_str = response.content
-
-        station_aqcols = [ccc for ccc in aq_cols if response_str.find(ccc) > -1]
-
-        if not station_aqcols:
-            #If we couldn't find any columns, go to the next station
-            continue
-
-        # For each column found add it to the list of viable stations
-        for aq_col in aq_stations.keys():
-            if aq_col in station_aqcols:
-                aq_stations[aq_col].append(name)
-
-        # Bring the data into a dataframe
-        dict_reader = csv.DictReader(StringIO(response_str))
-        csv_list = [rrr for rrr in dict_reader]
-
-        df = pd.DataFrame(csv_list)
-
-        # Fill missing columns
-        cols_add = set(df_cols) - set(df.columns)
-        for ccc in cols_add:
-            df[ccc] = np.nan
-
-        df['station'] = name
-        df['lon'] = station.lon
-        df['lat'] = station.lat
-
-        df = df.reindex(columns=df_cols)
-        df.columns = col_names
-
-        all_data = all_data.append(df, ignore_index=True)
-
-    session.close()
-
-    all_data = all_data.reindex(columns=col_names)
-    all_data['DateTime'] = (all_data['Date'] + ' ' + all_data['Time']).apply(
-        lambda x: dt.datetime.strptime(x, "%Y-%m-%d %H:%M"))
-    all_data = all_data.drop(['Date', 'Time'], 1)
-
-    all_data[['PM25', 'O3', 'SO2', 'CO']] = all_data[['PM25', 'O3', 'SO2', 'CO']].\
-        convert_objects(convert_numeric=True)
-
-    return all_data, aq_stations
+    return all_data
 
 
 def calculate_stations_aqi_data(station_data, breakpoints, aq_variables):
@@ -214,7 +195,7 @@ def calculate_aqi(station_obs, breakpoints):
     """
 
     aqi = 0
-    for name, value in station_obs.iteritems():
+    for name, value in station_obs.items():
         aqi = max(aqi, calculate_score(value, breakpoints, name))
 
     return aqi
@@ -246,13 +227,13 @@ def calculate_score(value, breakpoints, name):
     return 0 if np.isnan(out) else out
 
 
-def get_interpolated_grid_data(station_data, aq_variables):
+def get_interpolated_grid_data(station_data, aq_variables, data_dir = '/app/static/'):
     """
     Given a melted dataframe of cross-sectional station data
     (pertaining to one time stamp), output the corresponding grid data
     """
 
-    locs_file = DataDir + '/grid_locs.csv'
+    locs_file = os.path.join(data_dir, 'grid_locs.csv')
     locs = pd.read_csv(locs_file)
 
     lon_locs = np.unique(locs['c_lon'].values)
@@ -336,8 +317,8 @@ def predict_station(var_series):
     return last_value
 
 
-def get_breakpoints():
-    breaks_file = DataDir + '/breakpoints.csv'
+def get_breakpoints(data_dir = '/app/static'):
+    breaks_file = os.path.join(data_dir, 'breakpoints.csv')
     breakpoints = pd.read_csv(breaks_file)
 
     return breakpoints
@@ -363,8 +344,7 @@ def main():
 
     print('Get station data')
 
-    station_data_raw, aq_stations = get_station_raw_data(all_stations, start_date,
-                                                         end_date)
+    station_data_raw = get_station_raw_data(all_stations, start_date, end_date)
 
     print('Finished getting station data')
 
@@ -385,12 +365,10 @@ def main():
         station_time = all_station_data[all_station_data['DateTime'] <= ts]
 
         # Current station data
-        stations_output = calculate_stations_aqi_data(station_time,
-                                                      breakpoints, aq_variables)
+        stations_output = calculate_stations_aqi_data(station_time, breakpoints, aq_variables)
 
         # Interpolate the grid data
-        current_grid_data = get_interpolated_grid_data(stations_output,
-                                                       aq_variables)
+        current_grid_data = get_interpolated_grid_data(stations_output, aq_variables)
 
         current_grid_data['time'] = ts
         all_grid_data = all_grid_data.append(current_grid_data)

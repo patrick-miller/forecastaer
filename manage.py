@@ -1,3 +1,4 @@
+import datetime as dt
 from flask.ext.script import Manager
 
 from app import app
