@@ -26,4 +26,4 @@ zope.interface==4.1.1
 selenium==3.4.3
 beautifulsoup4==4.6.0
 PyVirtualDisplay==0.2.1
-matplotlib==1.5.3
+matplotlib==2.1.1
