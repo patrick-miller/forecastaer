@@ -1,5 +1,3 @@
-import {Spinner} from 'spin.js';
-
 var m_top = 4000,
     m_left = 4000,
     center_lat = 40.71,
