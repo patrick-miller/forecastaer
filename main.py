@@ -166,15 +166,13 @@ def calculate_stations_aqi_data(station_data, breakpoints, aq_variables):
 
     stations_out = stations_PM25_24hr.join(stations_O3_1hr).join(stations_O3_8hr)
 
-    stations_out['AQI'] = stations_out.apply(lambda x: calculate_aqi(x, breakpoints),
-                                             axis=1)
+    stations_out['AQI'] = stations_out.apply(lambda x: calculate_aqi(x, breakpoints), axis=1)
 
     stations_out.reset_index(level=[0,1,2], inplace=True)
     stations_out = stations_out[['station', 'lon', 'lat', 'PM25_24hr', 'O3_8hr', 'AQI']]
     stations_out.columns = ['station', 'lon', 'lat', 'PM25', 'O3', 'AQI']
 
-    stations_out = pd.melt(stations_out,
-                           id_vars=['station', 'lon', 'lat'], value_vars=aq_variables)
+    stations_out = pd.melt(stations_out, id_vars=['station', 'lon', 'lat'], value_vars=aq_variables)
     stations_out = stations_out.dropna()
 
     return stations_out
@@ -186,7 +184,7 @@ def calculate_aqi(station_obs, breakpoints):
     """
 
     aqi = 0
-    for name, value in station_obs.items():
+    for name, value in station_obs.iteritems():
         aqi = max(aqi, calculate_score(value, breakpoints, name))
 
     return aqi
