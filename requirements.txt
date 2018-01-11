@@ -24,6 +24,5 @@ wsgiref==0.1.2
 zope.interface==4.1.1
 selenium==3.4.3
 beautifulsoup4==4.6.0
-PyVirtualDisplay==0.2.1
 matplotlib==1.4.3
 html5lib==1.0.1

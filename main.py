@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from scipy import interpolate
 from matplotlib import mlab
-from pyvirtualdisplay import Display
 from selenium import webdriver
 import bs4
 
@@ -93,11 +92,7 @@ def get_station_raw_data(stations, start_date, end_date):
 
     # Load into one dataframe
     all_data = pd.DataFrame()
-    
-    # Start up a virtual display
-    # display = Display(visible=0, size=(800, 600))
-    # display.start()
-   
+       
     chrome_bin = os.environ.get('GOOGLE_CHROME_SHIM')
     if chrome_bin:
         options = webdriver.ChromeOptions()
@@ -154,8 +149,6 @@ def get_station_raw_data(stations, start_date, end_date):
         df_filtered.rename({'PM25C': 'PM25', 'Date Time': 'DateTime'}, inplace = True)
         
         all_data = all_data.append(df_filtered, ignore_index=True)
-
-    # display.stop()
 
     return all_data
 
