@@ -33,10 +33,9 @@ var mapOptions = {
 var all_grid_data = d3.map();
 
 //Spinner
-var spinner = new Spinner();
-var spin_target = document.getElementById('loading');
-spinner.spin(spin_target);
-
+//var spinner = new Spinner();
+//var spin_target = document.getElementById('loading');
+//spinner.spin(spin_target);
 
 
 // Queue up the data files
