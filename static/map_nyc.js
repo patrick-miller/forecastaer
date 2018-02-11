@@ -257,12 +257,12 @@ function ready(error, nyc_border_data, grid_json, grid_locs, breakpoints, grid_d
     });
 
     //On the input box submission
-    $('#location_input').on('keyup', function(e) {
-        if (e.keyCode === 13) {
-            var loc = document.getElementById('location_input').value;
-            geocodeLocation(loc);
-        }
-    });
+    // $('#location_input').on('keyup', function(e) {
+        // if (e.keyCode === 13) {
+            // var loc = document.getElementById('location_input').value;
+            // geocodeLocation(loc);
+        // }
+    // });
 
     //On current location click
     $('#geo_loc').click(function() {
